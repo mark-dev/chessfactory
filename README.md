@@ -18,5 +18,10 @@ This is simple web chess project which illustrate Spring websocket usage example
     Full featured game analysis
     In-game chat
 
-
-
+Screenshots:
+## Game
+![](https://raw.githubusercontent.com/mark-dev/chessfactory/master/screenshots/cf_game.jpg)
+## Game creation
+![](https://raw.githubusercontent.com/mark-dev/chessfactory/master/screenshots/cf_newgame.jpg)
+## Analysis
+![](https://raw.githubusercontent.com/mark-dev/chessfactory/master/screenshots/cf_analysis.jpg)
