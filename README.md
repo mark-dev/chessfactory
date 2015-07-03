@@ -1,4 +1,4 @@
-This is simple web chess project which illustrate Spring websocket usage example (STOMP + SockJS)
+This is simple web chess project which illustrate Spring websocket usage example (STOMP + SockJS) <br>
 
 It can be helpful for illustrate example usage of:
     ApplicationListeners (handle session connect/disconnect)
