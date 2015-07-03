@@ -1,0 +1,40 @@
+package ru.stuff.chess.entity.outgoing;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import ru.stuff.chess.entity.jsonutils.ClassNameJsonSerializator;
+import ru.stuff.chess.sys.GameRoles;
+
+/**
+ * Created by mark on 27.12.14.
+ */
+@JsonSerialize(using = ClassNameJsonSerializator.class)
+public class GameStarted {
+    public int gameId;
+    public GameRoles role;
+
+    public GameStarted() {
+    }
+
+    public GameStarted(int gameId, GameRoles role) {
+
+        this.gameId = gameId;
+        this.role = role;
+    }
+
+    public int getGameId() {
+
+        return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
+    }
+
+    public GameRoles getRole() {
+        return role;
+    }
+
+    public void setRole(GameRoles role) {
+        this.role = role;
+    }
+}

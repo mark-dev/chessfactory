@@ -1,0 +1,277 @@
+package ru.stuff;
+
+/**
+ * Created by mark on 15.12.14.
+ */
+
+import org.apache.log4j.Logger;
+import org.springframework.messaging.simp.annotation.SubscribeMapping;
+import ru.stuff.chess.entity.*;
+import ru.stuff.chess.sys.GameInfo;
+import ru.stuff.chess.sys.GameMember;
+import ru.stuff.chess.sys.GameOverReasons;
+import ru.stuff.chess.sys.GameRoles;
+import ru.stuff.service.GameService;
+import ru.stuff.service.UsersStorage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import ru.stuff.chess.entity.outgoing.*;
+
+import javax.annotation.PostConstruct;
+import java.security.Principal;
+import java.time.Duration;
+import java.util.Collection;
+import java.util.LinkedList;
+
+
+@Controller
+public class WebSocketController {
+    private static final Logger log = Logger.getLogger(WebSocketController.class);
+
+    private final String CHESS_LOBBY = "/queue/chesslobby";
+    private final String CHESS_EVENTS = "/topic/chesschat";
+    @Autowired
+    private GameService gameService;
+    @Autowired
+    private UsersStorage usersStorage;
+    @Autowired
+    private SimpMessagingTemplate template;
+
+    private boolean terminateGameOnDisconnect = false;
+
+    @MessageMapping("/achess/newgame")
+    public void createGame(CreateGame info, Principal user) {
+        //Прежде чем создавать надо наверное выйти из всех игр в которых участвуете?
+        gameService.removePlayerFromAllGames(user.getName());
+        GameInfo game = gameService.createGame(Duration.ofMinutes(info.getClockControl()));
+        sendToUser(user, new CreateGameResponse(new GameInfoContainer(game)));
+        joinGame(new SimpleGameIdContainer(game.getGameId()), user);
+        usersStorage.getOnlineUsers().forEach((u) -> {
+            if (!u.equals(user.getName())) //Не отправляем это юзеру создавшему игру!
+                sendToUser(u, new GameCreatedEvent(new GameInfoContainer(game)));
+        });
+
+    }
+
+    @MessageMapping("/achess/chat")
+    public void handleChat(ChessChatMessage msg, Principal user) {
+        Collection<GameMember> players = gameService.getMembers(msg.getGameId());
+        players.forEach((m) -> {
+            sendToUser(m.getUserName(),
+                    new ChatMessageFlow(user.getName(), msg.getPayload(), gameService.getGameRole(user.getName(), msg.getGameId())));
+        });
+    }
+
+    @MessageMapping("/achess/globalchat")
+    public void handleChat(GlobalChatMessage msg, Principal user) {
+        Collection<String> players = usersStorage.getOnlineUsers();
+        players.forEach((userName) -> {
+            sendToUser(userName, new ChatMessageFlow(user.getName(), msg.getPayload()));
+        });
+    }
+
+    @MessageMapping("/achess/joingame")
+    public void joinGame(SimpleGameIdContainer info, Principal user) {
+        log.info(String.format("JoinGame processing: %s %s", info.getGameId(), user.getName()));
+        GameInfo game = gameService.gameById(info.getGameId());
+        GameRoles role = gameService.joinGame(game, user.getName());
+
+        if (role != null) {
+            log.info(String.format("User %s join to game %s as %s", user.getName(), info.getGameId(), role));
+            sendToUser(user, new JoinGameResponse(role));
+            Collection<GameMember> players = game.getMembers();
+            if (role.isPlayer()) {
+                String currentPosition = game.getFen();
+                if (!currentPosition.isEmpty()) {
+                    //Если не пустая, значит что игра продолжается.
+                    //Значит отправляем зашедшемуактуальную позицию и сигнал о начале игры
+                    sendToUser(user.getName(), new GameStarted(info.getGameId(), role));
+                    sendToUser(user.getName(), new SyncPosition(currentPosition));
+                } else {
+                    if (game.isReadyToStart()) {
+                        gameService.startGame(info.getGameId());
+                        //Игра укомплектованна -- отправляем всем сигнал о начале игры
+                        players.forEach((m) -> {
+                            sendToUser(m.getUserName(), new GameStarted(info.getGameId(), m.getRole()));
+                        });
+                    } else {
+                        log.info("Game not ready yet! Wait opponent");
+                        //Ждем оппонента.. игра не готова чтобы начатся.
+                    }
+                }
+            }
+            //Передаем ему позицию и то что он зашел спектатором
+            else if (role == GameRoles.SPECTATOR)
+                sendToUser(user.getName(), new SpectatorJoin(info.getGameId(), game.getFen()));
+            //Если зашел игрок то отправляем всем
+            if (role.isPlayer())
+                broadcastEvent(new UpdateGameInfo(new GameInfoContainer(game)));
+        } else {
+            log.info(String.format("Join to game is FAILED! %s \tgameId:%d", user.getName(), info.getGameId()));
+        }
+    }
+
+    @MessageMapping("/achess/amove")
+    public void move(Move info, Principal user) {
+        log.debug(String.format("Move processing: %s %s %s",
+                info.getGameId(), info.getMove(), user.getName()));
+        GameInfo game = gameService.gameById(info.getGameId());
+
+        gameService.move(info.getGameId(), user.getName(), info.getMove(), info.getFen());
+        GameRoles playerRole = game.getGameRole(user.getName());
+        boolean isCheckMate = playerRole.isPlayer() && info.getMove().endsWith("#");
+
+        game.getMembers().forEach((m) -> {
+            if (!m.getUserName().equals(user.getName())) {
+                sendToUser(m.getUserName(), new NewMove(info.getGameId(), info.getMove()));
+            }
+            if (isCheckMate) {
+                sendToUser(m.getUserName(),
+                        new GameTerminated(GameOverReasons.MATE, playerRole.isBlack() ? GameRoles.BLACK : GameRoles.WHITE));
+                //Выходим из игры.
+                // gameService.leaveGame(info.getGameId(), m.getUserName());
+            }
+        });
+
+        if (isCheckMate) {
+            gameService.hideGame(game);
+        }
+    }
+
+    @MessageMapping("/achess/undomove")
+    public void undoMoveRequest(UndoMoveRequest request, Principal user) {
+        log.debug(String.format("flow undoMoveRequest: %d", request.gameId));
+        GameMember opponent = gameService.getOpponent(user.getName(), request.getGameId());
+        if (opponent != null) {
+            sendToUser(opponent.getUserName(), new UndoMoveServerRequest());
+        } else {
+            System.out.println("unable locate opponent for game: " + request.getGameId());
+        }
+    }
+
+    @MessageMapping("/achess/undomove_anwer")
+    public void undoMoveReply(UndoMoveClientReply reply, Principal user) {
+        log.debug(String.format("flow undoMoveReply: %s\tgameid: %d", reply.isAccepted, reply.gameId));
+        gameService.getMembers(reply.getGameId()).forEach(m -> {
+            sendToUser(m.getUserName(), new UndoMoveReply(reply.isAccepted));
+        });
+    }
+
+    @MessageMapping("/achess/surrender")
+    public void surrender(SimpleGameIdContainer gameInfo, Principal user) {
+        GameInfo game = gameService.gameById(gameInfo.getGameId());
+        if (game != null) {
+            GameRoles surrenderRole = game.getGameRole(user.getName());
+            gameService.hideGame(game);
+            game.getMembers().forEach(gm -> {
+                sendToUser(gm.getUserName(), new GameTerminated(GameOverReasons.SURRENDER, GameRoles.opposite(surrenderRole)));
+                //gameService.leaveGame(game, gm.getUserName());
+            });
+        }
+    }
+
+    @SubscribeMapping("/init_done")
+    public void onClientSubscribe(Principal user) {
+        sendToUser(user, new SyncOnlineUsers(usersStorage.getOnlineUsers()));
+        Collection<GameInfo> existedGames = gameService.getExistedGames();
+        Collection<GameInfoContainer> containers = new LinkedList<>();
+        existedGames.forEach((gi) -> {
+            containers.add(new GameInfoContainer(gi));
+        });
+        sendToUser(user, new SyncGames(containers));
+    }
+
+
+    @RequestMapping(value = "/")
+    public String root() {
+        return "auth_page";
+    }
+
+    @RequestMapping(value = "/chess")
+    public String chess() {
+        return "chess_lobby";
+    }
+
+    @RequestMapping(value = "/auth")
+    public String login() {
+        return "auth_page";
+    }
+
+    @PostConstruct
+    public void postConstruct() {
+        usersStorage.addListener((uname, isOnline) -> {
+            //Отправляем всем кто в сети что зашел новый юзер
+            log.debug(String.format("broadCast thats %s isOnline(%s)", uname, isOnline));
+            broadcastEvent(isOnline ? new UserOnlineEvent(uname) : new UserOfflineEvent(uname));
+            //Обрабатываем дисконтект юзера
+            if (!isOnline) {
+                //Берем все игры в которых он играл
+                Collection<GameInfo> affectedGames = gameService.getPlayerGames(uname);
+                if (affectedGames != null) {
+                    //Для каждой игры чекаем роль,
+                    affectedGames.forEach((game) -> {
+                        //Уведомляем всех пользователей что игрок дисконектнулся
+                        Collection<GameMember> members = game.getMembers();
+                        GameRoles disconnectedRole = game.getGameRole(uname);
+                        if (disconnectedRole != null) {
+                            members.forEach(gm -> {
+                                //Не шлем тому кто дисконектнулся
+                                if (!gm.getUserName().equals(uname)) {
+                                    //Во первых отправляем каждому юзеру что юзер вышел.
+                                    sendToUser(gm.getUserName(), new PlayerDisconnectedEvent(uname, disconnectedRole));
+                                    //если игрок - засчитываем ему поражение, завершаем игру
+                                    if (disconnectedRole.isPlayer() && terminateGameOnDisconnect) {
+                                        //Если игрок дисконектнулся то отправляем что игра завершена
+                                        sendToUser(gm.getUserName(),
+                                                new GameTerminated(GameOverReasons.DISCONNECT, GameRoles.opposite(disconnectedRole)));
+
+                                    }
+                                    //  gameService.leaveGame(game.getGameId(), gm.getUserName());
+                                }
+                            });
+                        }
+                        //выходит сам дисконектнувшийся игрок из игры.
+                        gameService.leaveGame(game, uname);
+                        if (disconnectedRole != null && disconnectedRole.isPlayer()) {
+                            if (terminateGameOnDisconnect)
+                                gameService.hideGame(game); //Логически удаляем игру.
+                            else {
+                                gameService.pauseGame(game);
+                            }
+                            broadcastEvent(new UpdateGameInfo(new GameInfoContainer(game)));
+                        }
+                    });
+                }
+            }
+        });
+        gameService.addClockWatchListener((gi) -> {
+            GameMember losePlayer = gi.getMovePlayer();
+            gi.getMembers().forEach((gm) -> {
+                System.out.println("Processing player: " + gm);
+                sendToUser(gm.getUserName(),
+                        new GameTerminated(GameOverReasons.CLOCK, losePlayer.getRole().isBlack() ?
+                                GameRoles.WHITE : GameRoles.BLACK));
+            });
+            gameService.hideGame(gi);
+        });
+        gameService.addGameDeletedListener((gi) -> {
+            broadcastEvent(new GameDeletedEvent(gi.getGameId()));
+        });
+    }
+
+    private void sendToUser(Principal p, Object evt) {
+        template.convertAndSendToUser(p.getName(), CHESS_LOBBY, evt);
+    }
+
+    private void sendToUser(String userName, Object evt) {
+        template.convertAndSendToUser(userName, CHESS_LOBBY, evt);
+    }
+
+    private void broadcastEvent(Object evt) {
+        System.out.println("Try to broadcast event: " + evt);
+        template.convertAndSend(CHESS_EVENTS, evt);
+    }
+}

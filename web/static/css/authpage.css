@@ -1,0 +1,75 @@
+@import url(fira.css);
+@import url(font-awesome.css);
+
+.header_text {
+    width: 100%;
+    display: block;
+    text-align: center;
+    font-weight: 600;
+    font-size: 30px;
+    padding: 15px;
+    padding-left: 5px;
+    margin-bottom: 5px;
+    font-family: 'FiraMono';
+    color: #f5f5f5;
+}
+
+.header_div {
+    width: 100%;
+    text-align: center;
+    background: #4f4f4f;
+}
+
+.namequery {
+    font-weight: 200;
+    font-size: 30px;
+    padding: 15px;
+    padding-left: 5px;
+    margin-bottom: 5px;
+    font-family: 'FiraMono';
+    color: #4f4f4f;
+}
+
+.auth_block {
+    margin-top: 185px;
+    display: block;
+    float: left;
+    width: 49%;
+
+}
+
+.auth_block input[type=text] {
+    float: left;
+    width: 320px;
+    height: 90px;
+    font-weight: bold;
+    font-size: 25px;
+    font-family: 'FiraMono';
+    color: lightcoral;
+
+}
+
+.auth_block input[type=submit] {
+    border: none;
+    height: 90px;
+    width: 80px;
+    background: transparent;
+    background-image: url('../img/yazart-chess/bQ.png');
+    float: left;
+}
+
+.workers_div {
+    width: 50%;
+    float: left
+}
+
+@media all and (max-width: 750px) {
+    .workers_div {
+        width: 0;
+        display: none !important;
+    }
+
+    body {
+        background-color: #d8ffba !important;
+    }
+}

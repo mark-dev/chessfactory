@@ -1,0 +1,681 @@
+/*--YAZART-DESING--*/
+@import url(fira.css);
+@import url(font-awesome.css);
+
+body {
+
+    font-family: 'FiraSans';
+    font-weight: 100;
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+}
+
+.header_logotype {
+    position: absolute;
+    display: block;
+    float: left;
+    top: 0;
+    width: 100%;
+    height: 75px;
+    background: #4f4f4f;
+    overflow: hidden;
+}
+
+.actionsli {
+    height: 100%;
+    width: auto;
+    padding-top: 22px;
+    padding-left: 10px;
+    padding-right: 10px;
+    float: right;
+    font-size: 16pt;
+    color: rgba(255, 255, 255, 0.6);
+    background-color: inherit;
+    text-decoration: none !important;
+    font-family: "FiraSans";
+    font-weight: 600;
+}
+
+.actionsli:hover {
+    color: rgba(255, 255, 255, 1);
+    background-color: rgba(0, 0, 0, 0.4);
+    transition: background 1s ease;
+    text-decoration: none;
+}
+
+.actionsli:visited {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.clock_ctrl {
+    border: none;
+    border-right: 1px black solid;
+    padding-top: 0;
+}
+
+.logo {
+    background-image: url(../img/logotype.png);
+    position: relative;
+    height: 75px;
+    width: 300px;
+    float: left;
+    left: 50%;
+    margin-left: -150px;;
+}
+
+.logo:hover {
+    background-image: url(../img/logotypehover.png);
+    background-color: rgba(0, 0, 0, 0.1);
+    transition: background 1s ease;
+}
+
+.logo:active {
+    background-color: rgba(0, 0, 0, 0.3);
+    transition: background 0.2s ease;
+}
+
+.chess-board-yaz {
+    display: none;
+    position: absolute;
+    float: left;
+    top: 900px;
+
+}
+
+.main-board {
+    display: block;
+    position: absolute;
+    float: left;
+    width: 100%;
+    top: 80px;
+
+}
+
+.active-games {
+    display: block;
+    float: left;
+    height: 600px;
+    width: 230px;
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+.active-games span {
+    width: 100%;
+    display: block;
+    text-align: center;
+    font-weight: 400;
+    padding: 15px;
+    padding-left: 5px;
+    margin-bottom: 5px;
+}
+
+.active-games ul {
+    height: 100%;
+    width: 100%;
+}
+
+.current_game {
+    border: 1px solid rgba(250, 150, 5, 1) !important;
+    border-left: 5px solid rgba(250, 150, 5, 1) !important;
+    border-right-color: transparent !important;
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.7) !important;
+    background: rgba(0, 0, 0, 0.5);
+!important;
+
+}
+
+.active-games ul li {
+    display: block;
+    width: 100%;
+    float: left;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    border-right-color: transparent;
+    border-left-color: transparent;
+    margin-top: -1px;
+    box-shadow: 0 0 2px rgba(255, 255, 255, 0.7);
+}
+
+.game_white_player {
+    font-weight: bold;
+    color: rgb(236, 187, 92);
+    width: 33% !important;
+}
+
+.game_black_player {
+    font-weight: bold;
+    color: #cecece;
+    width: 33% !important;
+}
+
+.game_name {
+    font-weight: bold;
+    color: rgb(255, 24, 117);
+}
+
+.game_list_clocks {
+    margin-top: 3px;
+    color: floralwhite;
+    float: left;
+    width: 33% !important;
+    font-weight: bold;
+    text-shadow: -1px -1px 1px rgba(130, 100, 30, 0.5);
+}
+
+.active-games ul li:hover {
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    border-left: 5px solid rgba(250, 150, 5, 1);
+    border-right-color: transparent;
+    box-shadow: inset 0 0 2px rgba(255, 255, 255, 0.7);
+}
+
+.active-games ul li:hover > a {
+    color: white;
+}
+
+.active-games ul li a {
+    text-align: center;
+    text-decoration: none;
+    float: left;
+    display: block;
+    width: 100%;
+    height: 25px;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+    /*color: rgba(255, 255, 255, 0.8);*/
+}
+
+.active-games ul li a:hover {
+    color: rgba(250, 150, 5, 1);
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+    font-weight: 400;
+}
+
+.active-users {
+    display: block;
+    float: left;
+    height: 100%;
+    width: 150px;
+}
+
+.active-users ul {
+    width: 100%;
+    list-style: none;
+}
+
+.active-users span {
+    width: 100%;
+    display: block;
+    text-align: center;
+    font-weight: 400;
+    padding: 15px;
+    padding-left: 5px;
+    margin-bottom: 5px;
+}
+
+.actions_panel {
+    width: 100%;
+    height: 50px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.clock_panel {
+    width: 100%;
+    height: 50px;
+    overflow: hidden;
+    padding: 0;
+    margin-bottom: 5px;
+    color: #4c4c4c;
+}
+
+.clock_panel div:first-child {
+    color: rgba(250, 150, 5, 1);
+    text-shadow: -1px -1px 1px rgba(130, 100, 30, 0.5);
+}
+
+.clock_panel div:last-child {
+    float: right;
+}
+
+.clock_panel div:last-child > i {
+    float: right;
+    margin-right: 5px;
+}
+
+.clock_panel div:last-child > span {
+    float: right;
+    margin-right: 5px;
+}
+
+.clock_panel div {
+    width: 33%;
+    float: left;
+    margin-left: 0;
+}
+
+.clock_panel div i {
+    float: left;
+    margin-left: 5px;
+    font-size: 30pt;
+    margin-top: -1px
+}
+
+.clock_panel div span {
+    font-family: 'FiraMono';
+    display: block;
+    float: left;
+    padding-top: 3px;
+    margin-left: 8px;
+    font-weight: 300;
+    font-size: 19pt;
+    text-align: center;
+}
+
+.actions_panel ul {
+    display: block;
+    list-style: none;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow-y: visible;
+}
+
+.actions_panel ul li {
+    float: left;
+    height: 95%;
+    width: 24%;
+/ / 196 px;
+    border: 1px solid rgba(60, 60, 60, 0.71);
+    border-left: none;
+}
+
+.actions_panel ul li:hover {
+    border-color: transparent !important;
+}
+
+.actions_panel ul li:first-child:hover {
+    border-right: 1px solid rgba(60, 60, 60, 0.71) !important;
+}
+
+.actions_panel ul li:first-child {
+    border-left: 1px solid rgba(60, 60, 60, 0.71);
+}
+
+.actions_panel ul li a {
+    color: rgba(45, 45, 45, 0.71);
+    text-align: center;
+    padding-top: 13px;
+    display: block;
+    height: 33px;;
+    font-family: 'FiraSans';
+    font-size: 14pt;
+    font-weight: 100;
+}
+
+.action_neutral:hover {
+    text-decoration: none;
+    background: rgba(230, 150, 0, 0.81);
+    color: white;
+    text-shadow: -1px -1px 2px rgba(130, 100, 30, 1);
+    border: 1px solid rgba(130, 100, 30, 0.41);
+}
+
+.action_positive:hover {
+    text-decoration: none;
+    background: rgba(195, 230, 80, 0.81);
+    color: white;
+    text-shadow: -1px -1px 2px rgba(130, 100, 30, 1);
+    border: 1px solid rgba(130, 100, 30, 0.41);
+}
+
+.giveup:hover {
+    text-decoration: none;
+    background: rgba(200, 80, 80, 0.81);
+    color: white;
+    text-shadow: -1px -1px 2px rgba(125, 5, 5, 1);
+    border: 1px solid rgba(125, 5, 5, 0.41);
+}
+
+.board_game {
+    display: block;
+    float: left;
+    height: 100%;
+    width: 500px;
+}
+
+.game_status {
+    margin-top: 5px;
+    display: block;
+    height: 100px;
+    width: 100%;
+    overflow: visible;
+}
+
+.status {
+    color: white;
+    padding: 5px;
+    width: 97%;
+    background: rgba(45, 45, 45, 0.7);
+    border: 2px solid rgba(25, 25, 25, 0.2);
+    margin-top: 3px;
+    font-family: 'FiraSans';
+    font-weight: 600;
+    text-align: center;
+}
+
+.state_name {
+    display: inline-block;
+    padding: 5px;
+    height: 20px;
+    width: 70px;;
+    margin-left: -20px;
+    text-align: left;
+    background: rgba(55, 55, 55, 1);
+    margin-right: 100%;
+    font-weight: 600;
+    font-size: 13pt;
+    border: 1px solid rgba(25, 25, 25, 0.2);
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: -1px -1px 1px rgba(45, 45, 45, 0.7);
+}
+
+.stst_ok {
+
+    background: rgba(55, 180, 120, 1);
+
+}
+
+.stst_wrng {
+
+    background: rgba(250, 150, 5, 1);
+
+}
+
+.stst_err {
+    background: rgba(200, 80, 80, 1);
+}
+
+.stst_info {
+    background: rgba(65, 130, 205, 1);
+}
+
+/*------END--------*/
+
+.chat_block {
+    display: block;
+    float: left;
+    height: 100%;
+    width: 300px;
+}
+
+.event_label {
+    font-weight: bold;
+    text-decoration: underline;
+    color: #ff8155;
+}
+
+.game_default {
+    color: rgb(255, 24, 117);
+}
+
+.notify_msg {
+    font-weight: bold;
+    color: #70adff;
+}
+
+.system_msg {
+    font-weight: bold;
+    color: #6f8486;
+}
+
+.chat_msg {
+    color: #ff6e7a;
+    font-weight: bold;
+}
+
+.chat_msg_black {
+    color: #000000;
+    font-weight: bold;
+}
+
+.chat_msg_white {
+    color: rgb(236, 187, 92);
+    font-weight: bold;
+}
+
+.chat_msg_spectator {
+    color: #969793;
+    font-weight: bold;
+}
+
+.header_text {
+    font-size: 36px;
+    text-align: center;
+    font-weight: bold;
+    color: #7e2cff;
+}
+
+.scrolable_chat {
+    height: 300px;
+    overflow-y: auto;
+    border: medium;
+    margin-left: 15px;
+}
+
+.online_users {
+    color: #ffa21c;
+    font-weight: bold;
+}
+.width95 {
+    width: 95%;
+}
+/*New game dialog*/
+
+.newgamedialog {
+    width: 400px
+}
+
+.full_width {
+    width: 100%;
+    display: block;
+}
+
+.param_header {
+    font-weight: bold;
+    color: #ffa21c;
+    font-family: FiraSans;
+}
+
+.slider_val {
+    font-family: 'FiraSans';
+    font-weight: 400;
+    padding-bottom: 20px;
+}
+
+.center_align {
+    text-align: center;
+}
+
+.editFen {
+    display: block;
+    width: 20px;
+}
+
+.editFenSpan {
+    display: inline-block;
+}
+
+.versus_ai_toggle {
+    display: inline-block;
+    border: black 1px solid;
+    color: #f5f5f5;
+    font-weight: bold;
+    font-family: FiraSans;
+    margin: 2px;
+}
+
+/*Выбор цвета*/
+.colorselect {
+    width: 100px;
+    height: 100px;
+}
+
+.blackColor {
+    background-image: url("../img/yazart-chess/bK.png") !important;
+    background-repeat: no-repeat !important;
+}
+
+.whiteColor {
+    background-image: url("../img/yazart-chess/wK.png") !important;
+    background-repeat: no-repeat !important;
+}
+
+.randomColor {
+    background-image: url("../img/random.png") !important;
+    background-repeat: no-repeat !important;
+}
+
+.pgnBlock {
+    height: 273px;
+}
+
+.pgnSpan {
+    overflow-x: auto;
+    overflow-y: auto;
+    width: 100%;
+    height: 80%;
+    display: block
+}
+
+.boardPreview {
+    display: inline-block;
+    width: 150px;
+    height: 150px;
+}
+
+/*Promotion Select stuff*/
+
+.promotionSelect {
+    width: 100px;
+    height: 100px;
+}
+
+.psqueen {
+    background-image: url("../img/yazart-chess/wQ.png") !important;
+    background-repeat: no-repeat !important;
+}
+
+.psknight {
+    background-image: url("../img/yazart-chess/wN.png") !important;
+    background-repeat: no-repeat !important;
+}
+
+.psrook {
+    background-image: url("../img/yazart-chess/wR.png") !important;
+    background-repeat: no-repeat !important;
+}
+
+.psbishop {
+    background-image: url("../img/yazart-chess/wB.png") !important;
+    background-repeat: no-repeat !important;
+}
+
+.bpsqueen {
+    background-image: url("../img/yazart-chess/bQ.png") !important;
+    background-repeat: no-repeat !important;
+}
+
+.bpsknight {
+    background-image: url("../img/yazart-chess/bN.png") !important;
+    background-repeat: no-repeat !important;
+}
+
+.bpsrook {
+    background-image: url("../img/yazart-chess/bR.png") !important;
+    background-repeat: no-repeat !important;
+}
+
+.bpsbishop {
+    background-image: url("../img/yazart-chess/bB.png") !important;
+    background-repeat: no-repeat !important;
+}
+
+/*Game preview*/
+.gamePreview {
+    width: 200px;
+    height: 200px;
+    font-size: 180px;
+    text-align: center;
+}
+
+/*Game analysis*/
+
+.cp_chart {
+    width: 805px;
+    height: 150px;
+}
+
+.move_number {
+    display: inline-block;
+    font-weight: bold;
+    font-size: 22px;
+    color: orange;
+    font-family: FiraSans
+}
+
+.main_line_move {
+    font-weight: bold;
+    font-family: FiraSans;
+    display: inline-block;
+    margin-left: 10px;
+    margin-right: 5px;
+    color: #f5f5f5;
+}
+.active_move  {
+    color: #c2e76d !important;
+}
+
+.best_move_seq {
+    font-style: italic;
+    color: #ecffc8;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.move_comment {
+    font-style: italic;
+    font-weight: 200;
+    font-size: 14px;
+    color: #f5f5f5;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.ommision_points {
+    font-style: italic;
+    margin-left: 10px;
+    margin-right: 5px;
+    color: #f5f5f5;
+}
+
+.analysis_progressbar_container {
+    width: 805px;
+    text-align: center
+}
+
+.analysis_progressbar_label {
+    font-weight: bold;
+    font-family: FiraSans;
+    color: #149bdf;
+}
+
+.analysis_progressbar {
+    width: 100%;
+}
