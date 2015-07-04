@@ -11,7 +11,7 @@ This is simple web chess project which illustrate Spring websocket usage example
 
 ######Implemented:
     Play versus another player
-    Play versus computer
+    Play versus engine
     Spectating games
     Time control
     Actions: undo move request, draw offer, give time for opponent, surrender
